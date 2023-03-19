@@ -50,6 +50,26 @@ func (b *bot) AcceptCallback(update tgbotapi.Update, supportID, userID int64) {
 			return
 		}
 
+		if st != defaultState {
+			return
+		}
+
+		updateMsg := tgbotapi.NewEditMessageText(
+			update.FromChat().ID,
+			update.CallbackQuery.Message.MessageID,
+			b.tl.GetMessageWithoutPrefix(
+				"", "user_cancel_request", map[string]interface{}{
+					"LastMessage": update.CallbackQuery.Message.Text,
+				},
+			),
+		)
+		updateMsg.ParseMode = tgbotapi.ModeMarkdown
+		_, err = b.bot.Request(updateMsg)
+		if err != nil {
+			log.Error().Err(err).Send()
+			return
+		}
+
 		return
 	}
 
@@ -263,6 +283,26 @@ func (b *bot) DeclineCallback(update tgbotapi.Update, supportID, userID int64) {
 			b.tl.GetMessageWithoutPrefix(b.db.languageDB().get(supportID), "user_no_expect"),
 		)
 		_, err := b.bot.Request(callback)
+		if err != nil {
+			log.Error().Err(err).Send()
+			return
+		}
+
+		if st != defaultState {
+			return
+		}
+
+		updateMsg := tgbotapi.NewEditMessageText(
+			update.FromChat().ID,
+			update.CallbackQuery.Message.MessageID,
+			b.tl.GetMessageWithoutPrefix(
+				"", "user_cancel_request", map[string]interface{}{
+					"LastMessage": update.CallbackQuery.Message.Text,
+				},
+			),
+		)
+		updateMsg.ParseMode = tgbotapi.ModeMarkdown
+		_, err = b.bot.Request(updateMsg)
 		if err != nil {
 			log.Error().Err(err).Send()
 			return
