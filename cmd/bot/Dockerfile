@@ -1,6 +1,5 @@
 FROM golang:1.18.0
 
-VOLUME /bot
 WORKDIR /app
 
 RUN export GO111MODULE=on
