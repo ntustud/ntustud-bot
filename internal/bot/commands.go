@@ -11,9 +11,11 @@ import (
 )
 
 const (
-	startCommand = "start"
-	breakCommand = "break"
-	getIDCommand = "get_id"
+	startCommand   = "start"
+	breakCommand   = "break"
+	cancelCommand  = "cancel"
+	getIDCommand   = "get_id"
+	getHelpCommand = "help"
 
 	setGroupCommand    = "set_group"
 	addSupportCommand  = "add_support"
@@ -98,7 +100,55 @@ func (b *bot) BreakCommand(update tgbotapi.Update) {
 	}
 }
 
-func (b *bot) GetID(update tgbotapi.Update) {
+func (b *bot) CancelCommand(update tgbotapi.Update) {
+	userState, err := b.db.getUserState(update.SentFrom().ID)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+
+	if userState != queueState {
+		var msg tgbotapi.MessageConfig
+		msg = tgbotapi.NewMessage(
+			update.Message.Chat.ID,
+			b.tl.GetMessage(b.db.languageDB().get(update.SentFrom().ID), "cancel_impossible"),
+		)
+		if userState == roomState {
+			msg = tgbotapi.NewMessage(
+				update.Message.Chat.ID,
+				b.tl.GetMessage(b.db.languageDB().get(update.SentFrom().ID), "room_start"),
+			)
+		}
+		_, err := b.bot.Send(msg)
+		if err != nil {
+			log.Error().Err(err).Send()
+		}
+		return
+	}
+
+	err = b.db.queueDB().delete(update.SentFrom().ID)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+	err = b.db.bufferDB().delete(update.SentFrom().ID)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+
+	msg := tgbotapi.NewMessage(
+		update.SentFrom().ID,
+		b.tl.GetMessage(b.db.languageDB().get(update.SentFrom().ID), "cancel_success"),
+	)
+	_, err = b.bot.Send(msg)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+}
+
+func (b *bot) GetIDCommand(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(b.tl.Prefix+" %d", update.SentFrom().ID))
 	_, err := b.bot.Send(msg)
 	if err != nil {
@@ -107,7 +157,19 @@ func (b *bot) GetID(update tgbotapi.Update) {
 	}
 }
 
-func (b *bot) SetGroup(update tgbotapi.Update) {
+func (b *bot) GetHelpCommand(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(
+		update.Message.Chat.ID,
+		b.tl.GetMessage(b.db.languageDB().get(update.SentFrom().ID), "help_command"),
+	)
+	_, err := b.bot.Send(msg)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+}
+
+func (b *bot) SetGroupCommand(update tgbotapi.Update) {
 	user := update.SentFrom()
 	if user.ID != b.adminID {
 		return
@@ -130,7 +192,7 @@ func (b *bot) SetGroup(update tgbotapi.Update) {
 	}
 }
 
-func (b *bot) AddSupport(update tgbotapi.Update) {
+func (b *bot) AddSupportCommand(update tgbotapi.Update) {
 	if update.SentFrom().ID != b.adminID {
 		return
 	}
@@ -185,7 +247,7 @@ func (b *bot) AddSupport(update tgbotapi.Update) {
 	}
 }
 
-func (b *bot) DelSupport(update tgbotapi.Update) {
+func (b *bot) DelSupportCommand(update tgbotapi.Update) {
 	if update.SentFrom().ID != b.adminID {
 		return
 	}
@@ -286,7 +348,7 @@ func (b *bot) DelSupport(update tgbotapi.Update) {
 	}
 }
 
-func (b *bot) GetSupports(update tgbotapi.Update) {
+func (b *bot) GetSupportsCommand(update tgbotapi.Update) {
 	supports, err := b.db.supportDB().getAll()
 	if err != nil {
 		log.Error().Err(err).Send()

@@ -15,7 +15,7 @@ func main() {
 		panic(err)
 	}
 
-	translator, err := translations.NewTranslator("./locales", cfg.DefaultLocale, cfg.BotPrefix)
+	translator, err := translations.NewTranslator("./locales", cfg.DefaultLocale, cfg.BotPrefix, false)
 	if err != nil {
 		log.Error().Err(err).Send()
 		panic(err)

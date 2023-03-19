@@ -103,16 +103,20 @@ func (b *bot) InitUpdates() {
 					b.StartCommand(update, userState)
 				case breakCommand:
 					b.BreakCommand(update)
+				case cancelCommand:
+					b.CancelCommand(update)
 				case getIDCommand:
-					b.GetID(update)
+					b.GetIDCommand(update)
+				case getHelpCommand:
+					b.GetHelpCommand(update)
 				case setGroupCommand:
-					b.SetGroup(update)
+					b.SetGroupCommand(update)
 				case addSupportCommand:
-					b.AddSupport(update)
+					b.AddSupportCommand(update)
 				case delSupportCommand:
-					b.DelSupport(update)
+					b.DelSupportCommand(update)
 				case getSupportsCommand:
-					b.GetSupports(update)
+					b.GetSupportsCommand(update)
 				}
 
 				continue

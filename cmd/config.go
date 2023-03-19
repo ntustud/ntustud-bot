@@ -11,6 +11,7 @@ type Config struct {
 	TelegramLoggerBotToken string `mapstructure:"bot_token"`
 	TelegramAdminUserID    int64  `mapstructure:"admin_user_id"`
 	DefaultLocale          string `mapstructure:"default_locale"`
+	EnableLocales          bool   `mapstructure:"enable_locales"`
 	BotPrefix              string `mapstructure:"bot_prefix"`
 }
 
@@ -22,6 +23,7 @@ func LoadConfig(path, configFile, configType string) (config Config, err error) 
 	viper.SetDefault("bot_token", "")
 	viper.SetDefault("admin_user_id", 0)
 	viper.SetDefault("default_locale", "uk-UA")
+	viper.SetDefault("enable_locales", true)
 	viper.SetDefault("bot_prefix", "🤖")
 
 	viper.AutomaticEnv()

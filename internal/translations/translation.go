@@ -11,7 +11,7 @@ type Translator struct {
 	Prefix string
 }
 
-func NewTranslator(localesDir, defaultLanguage, botPrefix string) (*Translator, error) {
+func NewTranslator(localesDir, defaultLanguage, botPrefix string, enableLocales bool) (*Translator, error) {
 	dirDirs, err := os.ReadDir(localesDir)
 	if err != nil {
 		return nil, err
@@ -20,15 +20,17 @@ func NewTranslator(localesDir, defaultLanguage, botPrefix string) (*Translator, 
 	var dirs []string
 	dirs = append(dirs, defaultLanguage)
 
-	for _, dir := range dirDirs {
-		if !dir.IsDir() {
-			continue
-		}
-		if defaultLanguage == dir.Name() {
-			continue
-		}
+	if enableLocales {
+		for _, dir := range dirDirs {
+			if !dir.IsDir() {
+				continue
+			}
+			if defaultLanguage == dir.Name() {
+				continue
+			}
 
-		dirs = append(dirs, dir.Name())
+			dirs = append(dirs, dir.Name())
+		}
 	}
 
 	i, err := i18n.New(
