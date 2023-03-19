@@ -12,11 +12,11 @@ import (
 
 const (
 	startCommand      = "start"
+	getHelpCommand    = "help"
 	breakCommand      = "break"
 	cancelCommand     = "cancel"
 	getIDCommand      = "get_id"
 	getIDGroupCommand = "get_group_id"
-	getHelpCommand    = "help"
 
 	setGroupCommand    = "set_group"
 	addSupportCommand  = "add_support"
@@ -51,6 +51,22 @@ func (b *bot) StartCommand(update tgbotapi.Update, userState state) {
 	_, err := b.bot.Send(msg)
 	if err != nil {
 		log.Error().Err(err).Send()
+	}
+}
+
+func (b *bot) GetHelpCommand(update tgbotapi.Update) {
+	if !update.FromChat().IsPrivate() {
+		return
+	}
+
+	msg := tgbotapi.NewMessage(
+		update.Message.Chat.ID,
+		b.tl.GetMessage(b.db.languageDB().get(update.SentFrom().ID), "help_command"),
+	)
+	_, err := b.bot.Send(msg)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
 	}
 }
 
@@ -158,18 +174,6 @@ func (b *bot) GetIDCommand(update tgbotapi.Update, group bool) {
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(b.tl.Prefix+" %d", id))
-	_, err := b.bot.Send(msg)
-	if err != nil {
-		log.Error().Err(err).Send()
-		return
-	}
-}
-
-func (b *bot) GetHelpCommand(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(
-		update.Message.Chat.ID,
-		b.tl.GetMessage(b.db.languageDB().get(update.SentFrom().ID), "help_command"),
-	)
 	_, err := b.bot.Send(msg)
 	if err != nil {
 		log.Error().Err(err).Send()

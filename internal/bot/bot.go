@@ -101,6 +101,8 @@ func (b *bot) InitUpdates() {
 				switch update.Message.Command() {
 				case startCommand:
 					b.StartCommand(update, userState)
+				case getHelpCommand:
+					b.GetHelpCommand(update)
 				case breakCommand:
 					b.BreakCommand(update)
 				case cancelCommand:
@@ -109,8 +111,6 @@ func (b *bot) InitUpdates() {
 					b.GetIDCommand(update, false)
 				case getIDGroupCommand:
 					b.GetIDCommand(update, true)
-				case getHelpCommand:
-					b.GetHelpCommand(update)
 				case setGroupCommand:
 					b.SetGroupCommand(update)
 				case addSupportCommand:
