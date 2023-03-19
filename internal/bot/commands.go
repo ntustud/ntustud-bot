@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	startCommand   = "start"
-	breakCommand   = "break"
-	cancelCommand  = "cancel"
-	getIDCommand   = "get_id"
-	getHelpCommand = "help"
+	startCommand      = "start"
+	breakCommand      = "break"
+	cancelCommand     = "cancel"
+	getIDCommand      = "get_id"
+	getIDGroupCommand = "get_group_id"
+	getHelpCommand    = "help"
 
 	setGroupCommand    = "set_group"
 	addSupportCommand  = "add_support"
@@ -148,8 +149,15 @@ func (b *bot) CancelCommand(update tgbotapi.Update) {
 	}
 }
 
-func (b *bot) GetIDCommand(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(b.tl.Prefix+" %d", update.SentFrom().ID))
+func (b *bot) GetIDCommand(update tgbotapi.Update, group bool) {
+	var id int64
+	if group {
+		id = update.Message.Chat.ID
+	} else {
+		id = update.SentFrom().ID
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(b.tl.Prefix+" %d", id))
 	_, err := b.bot.Send(msg)
 	if err != nil {
 		log.Error().Err(err).Send()

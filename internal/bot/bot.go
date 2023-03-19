@@ -106,7 +106,9 @@ func (b *bot) InitUpdates() {
 				case cancelCommand:
 					b.CancelCommand(update)
 				case getIDCommand:
-					b.GetIDCommand(update)
+					b.GetIDCommand(update, false)
+				case getIDGroupCommand:
+					b.GetIDCommand(update, true)
 				case getHelpCommand:
 					b.GetHelpCommand(update)
 				case setGroupCommand:
